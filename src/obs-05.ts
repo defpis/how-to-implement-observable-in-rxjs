@@ -1,8 +1,3 @@
-# 如何实现 rxjs 中的 Observable
-
-> 内容来源于 [`Ben Lesh`](https://github.com/benlesh) 的视频 [`Creating Observable From Scratch`](https://egghead.io/lessons/rxjs-creating-observable-from-scratch)，可以观看视频以加深理解。
-
-```typescript
 class SafeObserver {
   destination: any;
   isUnsubscribed = false;
@@ -64,4 +59,19 @@ class Observable {
     };
   }
 }
-```
+
+export const observable5 = new Observable((observer: any) => {
+  let i = 0;
+  const id = setInterval(() => {
+    if (i < 10) {
+      observer.next(i++);
+    } else {
+      observer.complete();
+    }
+  }, 100);
+
+  return (): void => {
+    console.log('disposed');
+    clearInterval(id);
+  };
+});

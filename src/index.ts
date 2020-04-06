@@ -1,75 +1,8 @@
-class SafeObserver {
-  destination: any;
-  isUnsubscribed = false;
-  _unsubscribe: any = null;
-
-  constructor(destination: any) {
-    this.destination = destination;
-  }
-
-  next(value: any): void {
-    const destination = this.destination;
-    if (destination.next && !this.isUnsubscribed) {
-      destination.next(value);
-    }
-  }
-
-  error(error: any): void {
-    const destination = this.destination;
-    if (!this.isUnsubscribed) {
-      this.unsubscribe();
-      if (destination.error) {
-        destination.error(error);
-      }
-    }
-  }
-
-  complete(): void {
-    const destination = this.destination;
-    if (!this.isUnsubscribed) {
-      this.unsubscribe();
-      if (destination.complete) {
-        destination.complete();
-      }
-    }
-  }
-
-  unsubscribe(): void {
-    this.isUnsubscribed = true;
-    if (this._unsubscribe) {
-      this._unsubscribe();
-    }
-  }
-}
-
-class Observable {
-  _subscribe: any;
-
-  constructor(subscribe: any) {
-    this._subscribe = subscribe;
-  }
-
-  subscribe(observer: any): any {
-    const safeObserver = new SafeObserver(observer);
-    safeObserver._unsubscribe = this._subscribe(safeObserver);
-    return (): void => safeObserver._unsubscribe();
-  }
-}
-
-const myObservable = new Observable((observer: any) => {
-  let i = 0;
-  const id = setInterval(() => {
-    if (i < 10) {
-      observer.next(i++);
-    } else {
-      observer.complete();
-    }
-  }, 100);
-  return (): void => {
-    console.log('unsubscribed');
-    clearInterval(id);
-  };
-});
+import { observable1 } from './obs-01';
+import { observable2 } from './obs-02';
+import { observable3 } from './obs-03';
+import { observable4 } from './obs-04';
+import { observable5 } from './obs-05';
 
 const observer = {
   next(value: any): void {
@@ -83,4 +16,23 @@ const observer = {
   },
 };
 
-const subscription = myObservable.subscribe(observer);
+// 极简
+// observable1(observer);
+
+// 异步
+// observable2(observer);
+
+// 取消订阅
+// const unsubscribe = observable3(observer);
+// setTimeout(() => {
+//   unsubscribe();
+// }, 500);
+
+// 实现SafeObserver
+// observable4(observer);
+
+// 完整实现
+const subscription = observable5.subscribe(observer);
+setTimeout(() => {
+  subscription.unsubscribe();
+}, 500);
